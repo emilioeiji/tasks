@@ -1,16 +1,19 @@
 import React, { Component } from 'react'
-import { View, Text, ImageBackground, StyleSheet, FlatList } from 'react-native'
+import { View, Text, ImageBackground, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native'
 
 import Task from '../components/Task'
 import commonStyles from '../commonStyles'
 import moment from 'moment'
 import 'moment/locale/pt-br'
 
+import Icon from 'react-native-vector-icons/FontAwesome'
+
 import todayImage from '../../assets/imgs/today.jpg'
 
 export default class TaskList extends Component {
 
     state = {
+        showDoneTasks: true,
         tasks: [{
             id: Math.random(),
             desc: 'Comprar Livro Código Limpo',
@@ -23,6 +26,10 @@ export default class TaskList extends Component {
             estimateAt: new Date(),
             doneAt: null,
         },]
+    }
+
+    toggleFilter = () => {
+        this.setState({ showDoneTasks: !this.state.showDoneTasks })
     }
 
     toggleTask = taskId => {
@@ -41,6 +48,15 @@ export default class TaskList extends Component {
         return (
             <View style={style.container}>
                 <ImageBackground style={style.background} source={todayImage}>
+                    <View style={style.iconBar}>
+                        <TouchableOpacity onPress={this.toggleFilter}>
+                            <Icon 
+                                name={this.state.showDoneTasks ? 'eye' : 'eye-slash'}
+                                size={20}
+                                color={commonStyles.colors.secondary}
+                            />
+                        </TouchableOpacity>
+                    </View>
                     <View style={style.titleBar}>
                         <Text style={style.title}>
                             Hoje
@@ -89,5 +105,11 @@ const style = StyleSheet.create({
         fontSize: 20,
         marginLeft: 20,
         marginBottom: 30,
-    }
+    },
+    iconBar: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginHorizontal: 20,
+        marginTop: Platform.OS === 'ios' ? 40 : 10,
+    },
 })
