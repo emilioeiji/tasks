@@ -1,8 +1,50 @@
 import React, { Component } from 'react'
-import { Modal, View, StyleSheet, TouchableWithoutFeedback, Text } from 'react-native'
+import { Modal,
+    Platform, 
+    View, 
+    StyleSheet, 
+    TouchableWithoutFeedback,
+    TouchableOpacity, 
+    Text,
+    TextInput,
+ } from 'react-native'
+
+import RNDateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
+import moment from 'moment'
 
 import commonStyles from '../commonStyles'
+
+const initialState = {desc: '', date: new Date(), showDatePicker: false }
 export default class AddTask extends Component {
+
+    state = {
+        ...initialState
+    }
+
+    getDatePicker = () => {
+        let datePicker = <RNDateTimePicker 
+                value={this.state.date}
+                onChange={(_, date) => this.setState({ date, showDatePicker: false })}
+                mode='date'/>
+
+        const dateString = moment(this.state.date).format('ddd, D [de] MMMM [de] YYYY')
+
+        if(Platform.OS === 'android' ) {
+            datePicker = (
+                <View>
+                    <TouchableOpacity onPress={() => this.setState({ showDatePicker: true })}>
+                        <Text style={styles.date}>
+                            {dateString}
+                        </Text>
+                    </TouchableOpacity>
+                    {this.state.showDatePicker && datePicker}
+                </View>
+            )
+        }
+
+        return datePicker
+    }
+
     render() {
         return(
             <Modal
@@ -14,17 +56,32 @@ export default class AddTask extends Component {
                 <TouchableWithoutFeedback
                     onPress={this.props.onCancel}
                 >
-                    <View style={style.background}>
+                    <View style={styles.background}>
 
                     </View>
                 </TouchableWithoutFeedback>
-                <View style={style.container}>
-                    <Text style={style.header}>Nova Tarefa</Text>
+                <View style={styles.container}>
+                    <Text style={styles.header}>Nova Tarefa</Text>
+                    <TextInput 
+                        style={styles.input}
+                        onChangeText={desc => this.setState({desc})}
+                        placeholder='Informe a descrição'
+                        value={this.state.desc}
+                    />
+                    {this.getDatePicker()}
+                    <View style={styles.buttons}>
+                        <TouchableOpacity onPress={this.props.onCancel}>
+                            <Text style={styles.button}>Cancelar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity>
+                            <Text style={styles.button}>Salvar</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
                 <TouchableWithoutFeedback
                     onPress={this.props.onCancel}
                 >
-                    <View style={style.background}>
+                    <View style={styles.background}>
 
                     </View>
                 </TouchableWithoutFeedback>
@@ -33,13 +90,12 @@ export default class AddTask extends Component {
     }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
     background: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.7)',
     },
     container: {
-        flex: 1,
         backgroundColor: '#fff'
     },
     header: {
@@ -49,5 +105,31 @@ const style = StyleSheet.create({
         textAlign: 'center',
         padding: 15,
         fontSize: 18,
-    }
+    },
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    button: {
+        margin: 20,
+        marginRight: 30,
+        color: commonStyles.colors.today,
+    },
+    input: {
+        fontFamily: commonStyles.fontFamily,
+        height: 40,
+        marginTop: 15,
+        marginLeft: 10,
+        marginRight: 10,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#e3e3e3',
+        borderRadius: 6,
+    },
+    date: {
+        fontFamily: commonStyles.fontFamily,
+        fontSize: 20,
+        marginLeft: 10,
+        marginTop: 10,
+    },
 })
