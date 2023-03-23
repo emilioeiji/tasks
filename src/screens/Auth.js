@@ -7,7 +7,6 @@ import {
     TouchableOpacity,
     Alert
 } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
 import { server, showError, showSuccess } from '../common'
 
 import axios from 'axios'
@@ -17,9 +16,9 @@ import commonStyles from '../commonStyles'
 import AuthInput from '../components/AuthInput'
 
 const initialState = {
-    username: '',
+    username: 'inaba',
     email: '',
-    password: '',
+    password: 'inaba0507',
     confirmPassword: '',
     stageNew: false,
 }
@@ -40,7 +39,6 @@ export default class Auth extends Component {
 
     signup = async () => {
         try {
-            console.log("Dados do formulário: ", `${server}accounts/signup`, this.state)
             await axios.post(`${server}/accounts/signup/`, {
                 email: this.state.email,
                 username: this.state.username,
@@ -62,8 +60,8 @@ export default class Auth extends Component {
                 password: this.state.password,
             })
 
-            axios.defaults.headers.common['Authorization'] = `bearer ${res.data.token}`
-            console.log("Dados do formulário: ", res)
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+            console.log("Dados do token: ", res.data.token)
             this.props.navigation.navigate('TaskList')
         } catch(e) {
             showError(e)

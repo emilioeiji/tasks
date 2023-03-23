@@ -15,7 +15,9 @@ import AddTask from './AddTask'
 import commonStyles from '../commonStyles'
 import moment from 'moment'
 import 'moment/locale/pt-br'
+import axios from 'axios'
 
+import { server, showError } from '../common'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
@@ -36,8 +38,23 @@ export default class TaskList extends Component {
 
     componentDidMount = async () => {
         const stateString = await AsyncStorage.getItem('tasksState')
-        const state = JSON.parse(stateString) || initialState
-        this.setState(state, this.filterTasks)
+        const savedState = JSON.parse(stateString) || initialState
+        this.setState({
+            showDoneTasks: savedState.showDoneTasks
+        }, this.filterTasks)
+
+        this.loadTasks()
+    }
+
+    loadTasks = async () => {
+        try {
+            const maxDate = moment().format('YYYY-MM-DD')
+            const res = await axios.get(`${server}/tasks/get/?date=${maxDate}`)
+            console.log("Dados das tasks: ", res)
+            this.setState({ tasks: res.data }, this.filterTasks)
+        } catch(e) {
+            showError(e)
+        }
     }
 
     toggleFilter = () => {
@@ -54,7 +71,9 @@ export default class TaskList extends Component {
         }
 
         this.setState({ visibleTasks })
-        AsyncStorage.setItem('tasksState', JSON.stringify(this.state))
+        AsyncStorage.setItem('tasksState', JSON.stringify({
+            showDoneTasks: this.state.showDoneTasks
+        }))
     }
 
     toggleTask = taskId => {
@@ -68,21 +87,25 @@ export default class TaskList extends Component {
         this.setState({ tasks }, this.filterTasks)
     }
 
-    addTask = newTask => {
+    addTask = async newTask => {
         if(!newTask.desc || !newTask.desc.trim()) {
             Alert.alert('Dados Inválidos', 'Descrição não informada!')
             return
         }
 
-        const tasks = [...this.state.tasks]
-        tasks.push({
-            id: Math.random(),
-            desc: newTask.desc,
-            estimateAt: newTask.date,
-            doneAt: null
-        })
+        try {
+            const formattedDate = moment(newTask.date).format('YYYY-MM-DD')
+            await axios.post(`${server}/tasks/create/`, {
+                desc: newTask.desc,
+                estimateAt: formattedDate
+            })
 
-        this.setState({ tasks, showAddTask: false}, this.filterTasks)
+            this.setState({ showAddTask: false}, this.loadTasks)
+
+        } catch(e) {
+            showError(e)
+        }
+
     }
 
     deleteTask = id => {
