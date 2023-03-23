@@ -61,7 +61,6 @@ export default class Auth extends Component {
             })
 
             axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-            console.log("Dados do token: ", res.data.token)
             this.props.navigation.navigate('TaskList')
         } catch(e) {
             showError(e)

@@ -54,8 +54,9 @@ export default props => {
         <GestureHandlerRootView>
             <Swipeable 
                 renderRightActions={getRightContent}
-                renderLeftActions={getLeftContent}
-                onSwipeableOpen={() => props.onDelete && props.onDelete(props.id)}>
+                // renderLeftActions={getLeftContent}
+                // onSwipeableOpen={() => props.onDelete && props.onDelete(props.id)}
+            >
                 <View style={style.container}>
                     <TouchableWithoutFeedback
                         onPress={() => props.onToggleTask(props.id) }

@@ -50,7 +50,6 @@ export default class TaskList extends Component {
         try {
             const maxDate = moment().format('YYYY-MM-DD')
             const res = await axios.get(`${server}/tasks/get/?date=${maxDate}`)
-            console.log("Dados das tasks: ", res)
             this.setState({ tasks: res.data }, this.filterTasks)
         } catch(e) {
             showError(e)
@@ -76,15 +75,13 @@ export default class TaskList extends Component {
         }))
     }
 
-    toggleTask = taskId => {
-        const tasks = [...this.state.tasks ]
-        tasks.forEach(task => {
-            if(task.id === taskId) {
-                task.doneAt = task.doneAt ? null : new Date()
-            }
-        })
-
-        this.setState({ tasks }, this.filterTasks)
+    toggleTask = async taskId => {
+        try {
+            await axios.put(`${server}/tasks/${taskId}/toggle/`)
+            await this.loadTasks()
+        } catch (e) {
+            showError(e)
+        }
     }
 
     addTask = async newTask => {
@@ -108,9 +105,13 @@ export default class TaskList extends Component {
 
     }
 
-    deleteTask = id => {
-        const tasks = this.state.tasks.filter(task => task.id !== id)
-        this.setState({ tasks}, this.filterTasks)
+    deleteTask = async id => {
+        try {
+            await axios.delete(`${server}/tasks/${id}/delete/`)
+            await this.loadTasks()
+        } catch (e) {
+            showError(e)
+        }
     }
 
     render() {
