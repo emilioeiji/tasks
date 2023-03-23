@@ -94,10 +94,10 @@ export default class TaskList extends Component {
         }
 
         try {
-            const formattedDate = moment(newTask.date).format('YYYY-MM-DD')
+            // const formattedDate = moment(newTask.date).format('YYYY-MM-DD')
             await axios.post(`${server}/tasks/create/`, {
                 desc: newTask.desc,
-                estimateAt: formattedDate
+                estimateAt: newTask.date
             })
 
             this.setState({ showAddTask: false}, this.loadTasks)

@@ -24,7 +24,7 @@ export default class AddTask extends Component {
     save = () => {
         const newTask = {
             desc: this.state.desc,
-            date: this.state.date
+            date: moment(this.state.date).format('YYYY-MM-DD')
         }
 
         if(this.props.onSave) {
