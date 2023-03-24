@@ -9,6 +9,7 @@ import {
     Platform,
     Alert 
 } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 
 import Task from '../components/Task'
 import AddTask from './AddTask'
@@ -78,7 +79,7 @@ export default class TaskList extends Component {
     toggleTask = async taskId => {
         try {
             await axios.put(`${server}/tasks/${taskId}/toggle/`)
-            await this.loadTasks()
+            this.loadTasks()
         } catch (e) {
             showError(e)
         }
@@ -108,13 +109,14 @@ export default class TaskList extends Component {
     deleteTask = async id => {
         try {
             await axios.delete(`${server}/tasks/${id}/delete/`)
-            await this.loadTasks()
+            this.loadTasks()
         } catch (e) {
             showError(e)
         }
     }
 
     render() {
+
         const today = moment().locale('pt-br').format('ddd, D [de] MMMM')
         return (
             <View style={style.container}>
