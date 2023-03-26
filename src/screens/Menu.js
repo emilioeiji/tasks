@@ -1,12 +1,23 @@
 import React from 'react'
-import { Text, View, ScrollView, StyleSheet, Platform } from 'react-native'
+import { 
+    Text, 
+    View, 
+    ScrollView, 
+    StyleSheet, 
+    Platform, 
+    TouchableOpacity 
+} from 'react-native'
 import { Gravatar } from 'react-native-gravatar'
 import {
     createDrawerNavigator,
     DrawerContentScrollView,
     DrawerItemList,
     DrawerItem,
-  } from '@react-navigation/drawer'
+} from '@react-navigation/drawer'
+
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Icon from 'react-native-vector-icons/FontAwesome'
 
 import TaskList from '../screens/TaskList'
 import commonStyles from '../commonStyles'
@@ -23,10 +34,21 @@ const menuConfig = {
 const Drawer = createDrawerNavigator()
 
 function CustomDrawerContent(props) {
+    const username = props.username
     const email = props.email
+
+    const logout = () => {
+        delete axios.defaults.headers.common['Authorization']
+        AsyncStorage.removeItem('userData')
+        props.navigation.navigate('AuthOrApp')
+    }
+
     return (
         <DrawerContentScrollView {...props}>
             <ScrollView>
+                <Text style={styles.title}>
+                    Tasks
+                </Text>
                 <View style={styles.header}>
                     <Gravatar 
                         style={styles.avatar}
@@ -35,9 +57,28 @@ function CustomDrawerContent(props) {
                             secure: true
                         }}
                     />
+                    <View style={styles.userInfo}>
+                        <Text style={styles.name}>{username}</Text>
+                        <Text style={styles.email}>{email}</Text>
+                    </View>
+                    <TouchableOpacity
+                        onPress={logout}
+                    >
+                        <View style={styles.logoutIcon}>
+                            <Icon 
+                                name='sign-out'
+                                size={30}
+                                color='#800'
+                            />
+                        </View>
+                    </TouchableOpacity>
                 </View>
-                <DrawerItem label="Teste" onPress={() => alert('Teste')} />
                 <DrawerItemList {...props} />
+                {/* <DrawerItem
+                    labelStyle={styles.drawerItem}
+                    label="LogOut" 
+                    onPress={() => alert('Teste')} 
+                /> */}
             </ScrollView>
         </DrawerContentScrollView>
     );
@@ -45,10 +86,11 @@ function CustomDrawerContent(props) {
 
 export default props => {
     const email = props.route.params.email
+    const username = props.route.params.username
     return (
       <Drawer.Navigator
         screenOptions={menuConfig}
-        drawerContent={(props) => <CustomDrawerContent {...props} email={email} />}
+        drawerContent={(props) => <CustomDrawerContent {...props} email={email} username={username} />}
       >
         <Drawer.Screen 
             name="Today"
@@ -83,12 +125,41 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#ddd',
     },
+    title: {
+        color: '#000',
+        fontFamily: commonStyles.fontFamily,
+        fontSize: 30,
+        paddingTop: Platform.OS === 'ios' ? 45 : 5,
+        padding: 10,
+    },
     avatar: {
         width: 60,
         height: 60,
         borderWidth: 3,
         borderRadius: 30,
         margin: 10,
-        marginTop: Platform.OS === 'ios' ? 30 : 10
+    },
+    userInfo: {
+        marginLeft: 10,
+    },
+    name: {
+        fontFamily: commonStyles.fontFamily,
+        fontSize: 20,
+        marginBottom: 5,
+        color: commonStyles.colors.mainText
+    },
+    email: {
+        fontFamily: commonStyles.fontFamily,
+        fontSize: 15,
+        color: commonStyles.colors.subText,
+        marginBottom: 10,
+    },
+    logoutIcon: {
+        marginLeft: 10,
+        marginBottom: 10,
+    },
+    drawerItem: {
+        fontFamily: commonStyles.fontFamily,
+        fontSize: 20
     }
 })

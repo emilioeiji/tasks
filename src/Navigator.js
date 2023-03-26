@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native'
 
 import MenuDrawer from './screens/Menu'
 import Auth from './screens/Auth'
+import AuthOrApp from './screens/AuthOrApp'
 
 const Stack = createNativeStackNavigator()
 
@@ -12,9 +13,14 @@ export default props => {
     return (
         <NavigationContainer>
             <Stack.Navigator
-            initialRouteName='Auth'
+            initialRouteName='AuthOrApp'
             screenOptions={{ headerShown: false}}
         >
+            <Stack.Screen 
+                name='AuthOrApp'
+                options={{ title: 'Loading'}}
+                component={AuthOrApp}
+            />
             <Stack.Screen
                 name='Auth'
                 options={{ title: 'Autenticação'}}
